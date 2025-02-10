@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem.LowLevel;
 
 public class UnitSelectionManager : MonoBehaviour
@@ -42,18 +44,66 @@ public class UnitSelectionManager : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, clickable))
             {
-                SelectByClicking(hit.collider.gameObject);
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    MultipleSelect(hit.collider.gameObject);
+                }
+                else
+                {
+                    SelectByClicking(hit.collider.gameObject);
+                }
             }
             else
             {
-                DeselectAll();
+                if (Input.GetKey(KeyCode.LeftShift) == false)
+                {
+                    DeselectAll();
+                }
+            }
+        }
+        if (Input.GetMouseButtonDown(1) && unitsSelected.Count > 0)
+        {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, ground))
+            {
+                groundmarker.transform.position = hit.point;
+
+                groundmarker.SetActive(false);
+                groundmarker.SetActive(true);
             }
         }
     }
 
+    private void MultipleSelect(GameObject unit)
+    {
+        if (unitsSelected.Contains(unit) == false)
+        {
+            unitsSelected.Add(unit);
+            TriggerSelectionIndicator(unit, true);
+            EnableUnitMovement(unit, true);
+        }
+        else
+        {
+            EnableUnitMovement(unit, false);
+            TriggerSelectionIndicator(unit, false);
+            unitsSelected.Remove(unit);
+        }
+
+    }
+
     private void DeselectAll()
     {
-        // throw new System.NotImplementedException();
+        // throw new System.NotImplementedException(); 
+        foreach (var unit in unitsSelected)
+        {
+            EnableUnitMovement(unit, false);
+            TriggerSelectionIndicator(unit, false);
+        }
+
+        groundmarker.SetActive(false);
+        unitsSelected.Clear();
     }
 
     private void SelectByClicking(GameObject unit)
@@ -62,11 +112,17 @@ public class UnitSelectionManager : MonoBehaviour
 
         unitsSelected.Add(unit);
 
+        TriggerSelectionIndicator(unit, true);
         EnableUnitMovement(unit, true);
     }
 
     private void EnableUnitMovement(GameObject unit, bool moveable)
     {
         unit.GetComponent<UnitMovement>().enabled = moveable;
+    }
+
+    private void TriggerSelectionIndicator(GameObject unit, bool isSelected)
+    {
+        unit.transform.GetChild(0).gameObject.SetActive(isSelected);
     }
 }
