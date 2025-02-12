@@ -16,7 +16,7 @@ public class AttackController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy") && targetToAttack == null)
+        if (other.CompareTag("Enemy") && targetToAttack != null)
         {
             targetToAttack = null;
         }

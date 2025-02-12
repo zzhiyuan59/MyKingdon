@@ -15,7 +15,7 @@ public class UnitIdleState : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (attackController.targetToAttack != null)
+        if (attackController != null && attackController.targetToAttack != null)
         {
             animator.SetBool("isFollowing", true);
         }

@@ -7,7 +7,6 @@ public class UnitFollowState : StateMachineBehaviour
 {
     AttackController attackController;
     NavMeshAgent agent;
-
     public float attackingDistance = 1f;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -27,8 +26,11 @@ public class UnitFollowState : StateMachineBehaviour
         }
 
         // moving Unit towards Enemy
-        agent.SetDestination(attackController.targetToAttack.position);
-        animator.transform.LookAt(attackController.targetToAttack);
+        if (attackController.targetToAttack != null)
+        {
+            agent.SetDestination(attackController.targetToAttack.position);
+            animator.transform.LookAt(attackController.targetToAttack);
+        }
 
         // should unit transition to Attack State?
         // float distanceFromTarget = Vector3.Distance(attackController.targetToAttack.position, animator.transform.position);
@@ -39,7 +41,7 @@ public class UnitFollowState : StateMachineBehaviour
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         agent.SetDestination(animator.transform.position);
     }
