@@ -8,6 +8,15 @@ public class SimplePatrol : MonoBehaviour
     private float timer = 0.0f;
     private float switchDirectionTime = 5.0f;
 
+    void Start()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false; // Allow it to fall
+        }
+    }
+
     void Update()
     {
         timer += Time.deltaTime;

@@ -14,8 +14,13 @@ public class UnitSelectionManager : MonoBehaviour
 
     public LayerMask clickable;
     public LayerMask ground;
+    public LayerMask attackable;
+
+    public bool attackCursorVisible;
+
 
     public GameObject groundmarker;
+
     private Camera cam;
 
     private void Awake()
@@ -74,6 +79,41 @@ public class UnitSelectionManager : MonoBehaviour
                 groundmarker.SetActive(true);
             }
         }
+
+        // attack target
+        if (unitsSelected.Count > 0 && AtleastOneOffensiveUnit(unitsSelected))
+        {
+            RaycastHit hit;
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, attackable))
+            {
+                Debug.Log("Enemy Hovered with mouse");
+
+                attackCursorVisible = true;
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    Transform target = hit.transform;
+                }
+            }
+        }
+        else
+        {
+            attackCursorVisible = false;
+        }
+    }
+
+    private bool AtleastOneOffensiveUnit(List<GameObject> unitsSelected)
+    {
+        foreach (GameObject unit in unitsSelected)
+        {
+            if (unit.GetComponent<AttackController>())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void MultipleSelect(GameObject unit)

@@ -22,15 +22,30 @@ public class UnitFollowState : StateMachineBehaviour
         // should unit transition to Idle State?
         if (attackController.targetToAttack == null)
         {
-            animator.SetBool("isFllowing", false);
+            animator.SetBool("isFollowing", false);
+        }
+        else
+        {
+            //if there is no other direct command to move
+            if (animator.transform.GetComponent<UnitMovement>().isCommandedToMove == false)
+            {
+                agent.SetDestination(attackController.targetToAttack.position);
+
+                // animator.transform.LookAt(attackController.targetToAttack); 
+                // the code cannot make sure that the unit is moving in a good direction
+
+                // Get the direction to the target
+                Vector3 directionToTarget = attackController.targetToAttack.position - animator.transform.position;
+                // Project the forward direction onto the gravity plane to prevent tilting
+                Vector3 projectedForward = Vector3.ProjectOnPlane(directionToTarget, Vector3.up).normalized;
+                // Create a rotation that looks at the target but keeps the 'up' aligned with gravity
+                Quaternion lookRotation = Quaternion.LookRotation(projectedForward, Vector3.up);
+                // Apply the rotation
+                animator.transform.rotation = lookRotation;
+            }
         }
 
-        // moving Unit towards Enemy
-        if (attackController.targetToAttack != null)
-        {
-            agent.SetDestination(attackController.targetToAttack.position);
-            animator.transform.LookAt(attackController.targetToAttack);
-        }
+
 
         // should unit transition to Attack State?
         // float distanceFromTarget = Vector3.Distance(attackController.targetToAttack.position, animator.transform.position);
@@ -41,8 +56,8 @@ public class UnitFollowState : StateMachineBehaviour
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        agent.SetDestination(animator.transform.position);
-    }
+    // public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    // {
+    //     agent.SetDestination(animator.transform.position);
+    // }
 }
